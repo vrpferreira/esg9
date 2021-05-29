@@ -1,5 +1,7 @@
 import React from "react";
 import { withRouter } from "react-router-dom";
+import './style.css';
+
 
 class Home extends React.Component {
     clickRegister = () => {
@@ -13,9 +15,9 @@ class Home extends React.Component {
     render() {
         return (
             <div className="Home">
-                <header className="Home-header">Home Header</header>
-                <button onClick={this.clickRegister}>Register</button>
-                <button onClick={this.clickLogin}>Login</button>
+                <header className="Home-header">Home</header>
+                <button className="Home-button-register" onClick={this.clickRegister}>Register</button>
+                <button className="Home-button-login" onClick={this.clickLogin}>Login</button>
             </div>
         );
     }

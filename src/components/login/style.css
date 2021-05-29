@@ -1,0 +1,48 @@
+.Login-header {
+    font-size: 35px;
+    font-family: Arial, Helvetica, sans-serif;
+    font-weight: bold;
+    color: Black;
+}
+
+.Login-form {
+    font-family: Arial, Helvetica, sans-serif;
+    font-weight: bold;
+    color: black;
+}
+
+.Login-button-login {
+    font-family: Arial, Helvetica, sans-serif;
+    color: white;
+    background-color: green;
+}
+
+.Login-button-forgot-password {
+    font-family: Arial, Helvetica, sans-serif;
+    color: white;
+    background-color: red;
+}
+
+.Login-button-home {
+    font-family: Arial, Helvetica, sans-serif;
+    color: white;
+    background-color: blue;
+}
+
+.Login-message-success {
+    font-family: Arial, Helvetica, sans-serif;
+    font-weight: bold;
+    color: green;
+}
+
+.Login-message-no-success {
+    font-family: Arial, Helvetica, sans-serif;
+    font-weight: bold;
+    color: red;
+}
+
+.Login-message-invalid {
+    font-family: Arial, Helvetica, sans-serif;
+    font-weight: bold;
+    color: red;
+}

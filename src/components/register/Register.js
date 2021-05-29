@@ -15,7 +15,6 @@ class Register extends React.Component {
         }
         this.onChangeUsername = this.onChangeUsername.bind(this)
         this.onChangePassword = this.onChangePassword.bind(this)
-        this.clickRegister = this.clickRegister.bind(this)
     }
 
     render() {
@@ -49,6 +48,13 @@ class Register extends React.Component {
         this.props.history.push("/")
     }
 
+    request = async (api, data) => {
+        const response = await fetch(api, data);
+        const json = await response.json();
+
+        this.setState({responseAWS: json.message});
+    }
+
     sendAwsRequest() {
         var invalidUsername = this.isInvalid(this.state.username)
         var invalidPassword = this.isInvalid(this.state.password)
@@ -75,13 +81,6 @@ class Register extends React.Component {
             this.setState({message: "Invalid input"})
             this.setState({messageCSS: "Register-message-invalid"})
         }
-    }
-
-    request = async (api, data) => {
-        const response = await fetch(api, data);
-        const json = await response.json();
-
-        this.setState({responseAWS: json.message});
     }
 
     checkResponseAWS() {
