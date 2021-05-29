@@ -1,24 +1,24 @@
-import React from 'react'
-import { BrowserRouter as Router, Route, Link } from "react-router-dom";
-import Register from '../register/Register'
-import Login from '../login/Login'
+import React from "react";
+import { withRouter } from "react-router-dom";
 
-function Home() {
-    return (
-        <Router>
+class Home extends React.Component {
+    clickRegister = () => {
+        this.props.history.push("/register");
+    };
+
+    clickLogin = () => {
+        this.props.history.push("/login");
+    }
+
+    render() {
+        return (
             <div className="Home">
-                <header className="Home-header">Home Page</header>
-                <li>
-                    <Link to="/register">Register</Link>
-                </li>
-                <li>
-                    <Link to="/login">Login</Link>
-                </li>
-                <Route path="/register" component={Register} />
-                <Route path="/login" component={Login} />
+                <header className="Home-header">Home Header</header>
+                <button onClick={this.clickRegister}>Register</button>
+                <button onClick={this.clickLogin}>Login</button>
             </div>
-        </Router>
-    );
+        );
+    }
 }
-
-export default Home;
+ 
+export default withRouter(Home);
