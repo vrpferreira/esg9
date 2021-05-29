@@ -99,8 +99,7 @@ class Login extends React.Component {
     checkResponseAWS() {
         if (this.state.responseAWS === "SUCCESS") {
             this.setState({responseAWS: ""})
-            this.setState({message: "Successful login"})
-            this.setState({messageCSS: "Login-message-success"})
+            this.props.history.push("/main")
         }
         else if (this.state.responseAWS === "NO_SUCCESS") {
             this.setState({responseAWS: ""})
