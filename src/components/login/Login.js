@@ -1,6 +1,7 @@
-import React from "react";
-import { withRouter } from "react-router-dom";
-import './style.css';
+import React from "react"
+import {withRouter} from "react-router-dom"
+import {ReactSession} from "react-client-session"
+import './style.css'
 
 
 class Login extends React.Component {
@@ -15,14 +16,6 @@ class Login extends React.Component {
         }
         this.onChangeUsername = this.onChangeUsername.bind(this)
         this.onChangePassword = this.onChangePassword.bind(this)
-    }
-
-    clickLogin = () => {
-        this.props.history.push("/main");
-    };
-
-    clickHome = () => {
-        this.props.history.push("/");
     }
 
     render() {
@@ -48,7 +41,7 @@ class Login extends React.Component {
             </div>
         );
     }
-
+    
     clickLogin = () => {
         this.sendAwsRequest()
     };
@@ -62,10 +55,9 @@ class Login extends React.Component {
     }
 
     request = async (api, data) => {
-        const response = await fetch(api, data);
-        const json = await response.json();
-
-        this.setState({responseAWS: json.message});
+        const response = await fetch(api, data)
+        const json = await response.json()
+        this.setState({responseAWS: json.message})
     }
 
     sendAwsRequest() {
@@ -98,6 +90,7 @@ class Login extends React.Component {
 
     checkResponseAWS() {
         if (this.state.responseAWS === "SUCCESS") {
+            ReactSession.set("username", this.state.username)
             this.setState({responseAWS: ""})
             this.props.history.push("/main")
         }
@@ -109,7 +102,7 @@ class Login extends React.Component {
     }
 
     componentDidMount() {
-        this.interval = setInterval(() => this.checkResponseAWS(), 1000);
+        this.interval = setInterval(() => this.checkResponseAWS(), 1000)
     }
 
     componentWillUnmount() {
