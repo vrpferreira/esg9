@@ -10,13 +10,19 @@ class Main extends React.Component {
         this.state = {
             body: null,
             carArray: [],
-            carId: -1,
+            carId: 0,
             carBrand: "",
             carModel: "",
             carColor: "",
             carPrice: "",
             carImage: "",
+            name: "",
+            address: "",
+            email: ""
         }
+        this.onChangeName = this.onChangeName.bind(this)
+        this.onChangeAddress = this.onChangeAddress.bind(this)
+        this.onChangeEmail = this.onChangeEmail.bind(this)
     }
 
     render() {
@@ -29,11 +35,7 @@ class Main extends React.Component {
                 <button onClick={this.clickLogout}>Logout</button>
                 <div className="Main-place-order-panel">
                     <header>Place order</header>
-                    <img src={this.state.carImage} alt="Car"/>
-                    <div className="Main-car-info-brand">Brand: {this.state.carBrand}</div>
-                    <div className="Main-car-info-model">Model: {this.state.carModel}</div>
-                    <div className="Main-car-info-color">Color: {this.state.carColor}</div>
-                    <div className="Main-car-info-price">Price: {this.state.carPrice}</div>
+                    {this.renderCarAndFieldsPlaceOrder()}
                 </div>
                 <div>Selected car id: {this.state.carId}</div>
                 <div>
@@ -62,13 +64,33 @@ class Main extends React.Component {
         );
     }
 
-    clickSelect(id, brand, model, color, price, image) {
-        this.setState({carId: id})
-        this.setState({carBrand: brand})
-        this.setState({carModel: model})
-        this.setState({carColor: color})
-        this.setState({carPrice: price})
-        this.setState({carImage: image})
+    renderCarAndFieldsPlaceOrder() {
+        if (this.state.carId !== 0) {
+            return(
+                <div>
+                    <img src={this.state.carImage} alt="Car"/>
+                    <div className="Main-car-info-brand">Brand: {this.state.carBrand}</div>
+                    <div className="Main-car-info-model">Model: {this.state.carModel}</div>
+                    <div className="Main-car-info-color">Color: {this.state.carColor}</div>
+                    <div className="Main-car-info-price">Price: {this.state.carPrice}</div>
+                    <div className="Main-place-order-form">
+                        <p>
+                            <label>Name</label>
+                            <input type="text" name="name" value={this.state.name} onChange={this.onChangeName}></input>
+                        </p>
+                        <p>
+                            <label>Address</label>
+                            <input type="text" name="address" value={this.state.address} onChange={this.onChangeAddress}></input>
+                        </p>
+                        <p>
+                            <label>Email</label>
+                            <input type="text" name="email" value={this.state.email} onChange={this.onChangeEmail}></input>
+                        </p>
+                        <button onClick={() => this.clickPlaceOrder()}>Place order</button>
+                    </div>
+                </div>
+            )
+        }
     }
 
     request = async (api, data) => {
@@ -122,6 +144,24 @@ class Main extends React.Component {
         clearInterval(this.interval)
     }   
 
+    clickPlaceOrder() {
+        var invalidName = this.isInvalid(this.state.email)
+        var invalidAddress = this.isInvalid(this.state.email)
+        var invalidEmail = this.isInvalid(this.state.email)
+        console.log("invalid name: ",invalidName)
+        console.log("invalid address: ",invalidAddress)
+        console.log("invalid email: ",invalidEmail)
+    }
+
+    clickSelect(id, brand, model, color, price, image) {
+        this.setState({carId: id})
+        this.setState({carBrand: brand})
+        this.setState({carModel: model})
+        this.setState({carColor: color})
+        this.setState({carPrice: price})
+        this.setState({carImage: image})
+    }
+
     clickHome = () => {
         this.props.history.push("/")
     }
@@ -133,6 +173,22 @@ class Main extends React.Component {
     clickLogout = () => {
         this.props.history.push("/")
         ReactSession.set("username", null)
+    }
+
+    onChangeName(event) {
+        this.setState({name : event.target.value})
+    }
+
+    onChangeAddress(event) {
+        this.setState({address : event.target.value})
+    }
+
+    onChangeEmail(event) {
+        this.setState({email : event.target.value})
+    }
+
+    isInvalid(string) {
+        return (string.length === 0 || !string.trim())
     }
 }
  
