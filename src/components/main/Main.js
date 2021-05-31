@@ -87,14 +87,16 @@ class Main extends React.Component {
 
     checkSession() {
         var username = ReactSession.get("username")
-        if (username == null) {
+        if (username === null) {
             this.props.history.push("/loginfirst")
+        }
+        else {
+            this.sendAwsRequest()
         }
     }
 
     componentDidMount() {
         this.checkSession()
-        this.sendAwsRequest()
         this.interval = setInterval(() => this.receiveAwsResponse(), 1000)
     }
 

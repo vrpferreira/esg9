@@ -9,22 +9,25 @@ import LoginFirst from './components/loginfirst/LoginFirst'
 import {ReactSession} from "react-client-session"
 
 
-function App() {
-    return (
-        <Router>
-            <div className='App'>
-                {ReactSession.setStoreType("localStorage")}
-                {ReactSession.set("username", ReactSession.get("username"))}
+class App extends React.Component {
 
-                <Route exact path="/" component={Home} />
-                <Route path="/register" component={Register} />
-                <Route path="/login" component={Login} />
-                <Route path="/main" component={Main} />
-                <Route path="/profile" component={Profile} />
-                <Route path="/loginfirst" component={LoginFirst} />
-            </div>
-        </Router>
-    );
+    render() {
+        return (
+            <Router>
+                <div className='App'>
+                    {ReactSession.setStoreType("localStorage")}
+                    {ReactSession.set("username", ReactSession.get("username"))}
+    
+                    <Route exact path="/" component={Home} />
+                    <Route path="/register" component={Register} />
+                    <Route path="/login" component={Login} />
+                    <Route path="/main" component={Main} />
+                    <Route path="/profile" component={Profile} />
+                    <Route path="/loginfirst" component={LoginFirst} />
+                </div>
+            </Router>
+        );
+    }
 }
 
 export default App;
