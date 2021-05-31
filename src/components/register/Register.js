@@ -83,7 +83,7 @@ class Register extends React.Component {
         }
     }
 
-    checkAwsResponse() {
+    receiveAwsResponse() {
         if (this.state.responseAWS === "SUCCESS") {
             this.setState({responseAWS: ""})
             this.setState({message: "Successful registration"})
@@ -97,7 +97,7 @@ class Register extends React.Component {
     }
     
     componentDidMount() {
-        this.interval = setInterval(() => this.checkAwsResponse(), 1000);
+        this.interval = setInterval(() => this.receiveAwsResponse(), 1000);
     }
 
     componentWillUnmount() {

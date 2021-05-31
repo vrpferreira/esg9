@@ -88,7 +88,7 @@ class Login extends React.Component {
         }
     }
 
-    checkAwsResponse() {
+    receiveAwsResponse() {
         if (this.state.responseAWS === "SUCCESS") {
             ReactSession.set("username", this.state.username)
             this.setState({responseAWS: ""})
@@ -102,7 +102,7 @@ class Login extends React.Component {
     }
 
     componentDidMount() {
-        this.interval = setInterval(() => this.checkAwsResponse(), 1000)
+        this.interval = setInterval(() => this.receiveAwsResponse(), 1000)
     }
 
     componentWillUnmount() {

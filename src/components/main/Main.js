@@ -9,7 +9,8 @@ class Main extends React.Component {
         super(props);
         this.state = {
             body: null,
-            carArray: []
+            carArray: [],
+            carId: 0
         }
     }
 
@@ -21,8 +22,8 @@ class Main extends React.Component {
                 <button onClick={this.clickHome}>Home</button>
                 <button onClick={this.clickProfile}>Profile</button>
                 <button onClick={this.clickLogout}>Logout</button>
+                <div>Selected car id: {this.state.carId}</div>
                 <div>
-                    <header>Cars</header>
                     <div>{this.renderCarList()}</div>
                 </div>
             </div>
@@ -33,6 +34,7 @@ class Main extends React.Component {
     renderCarList() {
         return(
             <div className="Cars">
+                <header>Cars</header>
                 {this.state.carArray.map(car => (
                     <div className = "Main-car-info" key={car.id}>
                         <div className="Main-car-info-brand">Brand: {car.brand}</div>
@@ -40,11 +42,15 @@ class Main extends React.Component {
                         <div className="Main-car-info-color">Color: {car.color}</div>
                         <div className="Main-car-info-price">Price: {car.price}</div>
                         <img src={car.image} alt="Car"/>
-                        <button>Buy</button>
+                        <button onClick={() => this.clickSelect(car.id)}>Select</button>
                     </div>
                 ))}
             </div>
         );
+    }
+
+    clickSelect(id) {
+        this.setState({carId: id})
     }
 
     request = async (api, data) => {
@@ -65,7 +71,7 @@ class Main extends React.Component {
         this.request(api, data);
     }
 
-    checkAwsResponse() {
+    receiveAwsResponse() {
         if (this.state.body != null && this.state.carArray.length === 0) {
             //convert and add cars to this.state.carList
             var jsonString = JSON.parse(this.state.body);
@@ -76,20 +82,8 @@ class Main extends React.Component {
                 array.push(obj)
             }
             this.setState({carArray: array})
-            clearInterval(this.interval)
-            this.interval = setInterval(() => this.renderCarList(), 1000)
         }
     }
-
-    componentDidMount() {
-        this.checkSession()
-        this.sendAwsRequest()
-        this.interval = setInterval(() => this.checkAwsResponse(), 1000)
-    }
-
-    componentWillUnmount() {
-        clearInterval(this.interval)
-    }   
 
     checkSession() {
         var username = ReactSession.get("username")
@@ -97,6 +91,16 @@ class Main extends React.Component {
             this.props.history.push("/loginfirst")
         }
     }
+
+    componentDidMount() {
+        this.checkSession()
+        this.sendAwsRequest()
+        this.interval = setInterval(() => this.receiveAwsResponse(), 1000)
+    }
+
+    componentWillUnmount() {
+        clearInterval(this.interval)
+    }   
 
     clickHome = () => {
         this.props.history.push("/")
