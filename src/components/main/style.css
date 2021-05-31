@@ -3,6 +3,19 @@
     font-weight: bold;
     color: Black;
     border: 1px solid black;
-    width: 500px;
+    width: 480px;
+    padding: 10px;
+}
+
+.Main-place-order-panel {
+    position: absolute;
+    width: 480px;
+    height: 800px;
+    right: 20px;
+    font-family: Arial, Helvetica, sans-serif;
+    font-weight: bold;
+    color: Black;
+    border: 1px solid black;
+    
     padding: 10px;
 }

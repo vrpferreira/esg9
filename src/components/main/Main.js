@@ -10,7 +10,12 @@ class Main extends React.Component {
         this.state = {
             body: null,
             carArray: [],
-            carId: 0
+            carId: -1,
+            carBrand: "",
+            carModel: "",
+            carColor: "",
+            carPrice: "",
+            carImage: "",
         }
     }
 
@@ -22,6 +27,14 @@ class Main extends React.Component {
                 <button onClick={this.clickHome}>Home</button>
                 <button onClick={this.clickProfile}>Profile</button>
                 <button onClick={this.clickLogout}>Logout</button>
+                <div className="Main-place-order-panel">
+                    <header>Place order</header>
+                    <img src={this.state.carImage} alt="Car"/>
+                    <div className="Main-car-info-brand">Brand: {this.state.carBrand}</div>
+                    <div className="Main-car-info-model">Model: {this.state.carModel}</div>
+                    <div className="Main-car-info-color">Color: {this.state.carColor}</div>
+                    <div className="Main-car-info-price">Price: {this.state.carPrice}</div>
+                </div>
                 <div>Selected car id: {this.state.carId}</div>
                 <div>
                     <div>{this.renderCarList()}</div>
@@ -37,20 +50,25 @@ class Main extends React.Component {
                 <header>Cars</header>
                 {this.state.carArray.map(car => (
                     <div className = "Main-car-info" key={car.id}>
+                        <img src={car.image} alt="Car"/>
                         <div className="Main-car-info-brand">Brand: {car.brand}</div>
                         <div className="Main-car-info-model">Model: {car.model}</div>
                         <div className="Main-car-info-color">Color: {car.color}</div>
                         <div className="Main-car-info-price">Price: {car.price}</div>
-                        <img src={car.image} alt="Car"/>
-                        <button onClick={() => this.clickSelect(car.id)}>Select</button>
+                        <button onClick={() => this.clickSelect(car.id, car.brand, car.model, car.color, car.price, car.image)}>Select</button>
                     </div>
                 ))}
             </div>
         );
     }
 
-    clickSelect(id) {
+    clickSelect(id, brand, model, color, price, image) {
         this.setState({carId: id})
+        this.setState({carBrand: brand})
+        this.setState({carModel: model})
+        this.setState({carColor: color})
+        this.setState({carPrice: price})
+        this.setState({carImage: image})
     }
 
     request = async (api, data) => {
