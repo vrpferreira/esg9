@@ -9,9 +9,8 @@ class Main extends React.Component {
         super(props);
         this.state = {
             body: null,
-            carList: []
+            carArray: []
         }
-
     }
 
     render() {
@@ -22,63 +21,28 @@ class Main extends React.Component {
                 <button onClick={this.clickHome}>Home</button>
                 <button onClick={this.clickProfile}>Profile</button>
                 <button onClick={this.clickLogout}>Logout</button>
-                {this.divCarsList()}
+                <div>
+                    <header>Cars</header>
+                    <div>{this.renderCarList()}</div>
+                </div>
             </div>
             
         );
     }
 
-    divCarsList() {
+    renderCarList() {
         return(
             <div className="Cars">
-                <div className="Main-car-info">
-                    <img src="https://car-images-esg9.s3.amazonaws.com/porsche1.png" alt="Logo"/>
-                    <p>Brand: Porsche</p>
-                    <p>Model: 911-GT3-RS</p>
-                    <p>Color: X</p>
-                    <p>Price: 230000€</p>
-                    <button>Buy</button>
-                </div>
-                <div className="Main-car-info">
-                    <img src="https://car-images-esg9.s3.amazonaws.com/porsche2.png" alt="Logo"/>
-                    <p>Brand: Porsche</p>
-                    <p>Model: 911-GT3-RS</p>
-                    <p>Color: X</p>
-                    <p>Price: 230000€</p>
-                    <button>Buy</button>
-                </div>
-                <div className="Main-car-info">
-                    <img src="https://car-images-esg9.s3.amazonaws.com/porsche3.png" alt="Logo"/>
-                    <p>Brand: Porsche</p>
-                    <p>Model: 911-GT3-RS</p>
-                    <p>Color: X</p>
-                    <p>Price: 230000€</p>
-                    <button>Buy</button>
-                </div>
-                <div className="Main-car-info">
-                    <img src="https://car-images-esg9.s3.amazonaws.com/porsche4.png" alt="Logo"/>
-                    <p>Brand: Porsche</p>
-                    <p>Model: 911-GT3-RS</p>
-                    <p>Color: X</p>
-                    <p>Price: 230000€</p>
-                    <button>Buy</button>
-                </div>
-                <div className="Main-car-info">
-                    <img src="https://car-images-esg9.s3.amazonaws.com/porsche5.png" alt="Logo"/>
-                    <p>Brand: Porsche</p>
-                    <p>Model: 911-GT3-RS</p>
-                    <p>Color: X</p>
-                    <p>Price: 230000€</p>
-                    <button>Buy</button>
-                </div>
-                <div className="Main-car-info">
-                    <img src="https://car-images-esg9.s3.amazonaws.com/porsche6.png" alt="Logo"/>
-                    <p>Brand: Porsche</p>
-                    <p>Model: 911-GT3-RS</p>
-                    <p>Color: X</p>
-                    <p>Price: 230000€</p>
-                    <button>Buy</button>
-                </div>
+                {this.state.carArray.map(car => (
+                    <div className = "Main-car-info" key={car.id}>
+                        <div className="Main-car-info-brand">Brand: {car.brand}</div>
+                        <div className="Main-car-info-model">Model: {car.model}</div>
+                        <div className="Main-car-info-color">Color: {car.color}</div>
+                        <div className="Main-car-info-price">Price: {car.price}</div>
+                        <img src={car.image} alt="Car"/>
+                        <button>Buy</button>
+                    </div>
+                ))}
             </div>
         );
     }
@@ -101,28 +65,26 @@ class Main extends React.Component {
         this.request(api, data);
     }
 
-    checkResponseAWS() {
-        if (this.state.body != null) {
+    checkAwsResponse() {
+        if (this.state.body != null && this.state.carArray.length === 0) {
             //convert and add cars to this.state.carList
-            var jsonString= JSON.parse(this.state.body);
+            var jsonString = JSON.parse(this.state.body);
             var jsonStringList = jsonString.split(/\n/)
-
+            var array = []
             for (var i in jsonStringList) {
                 var obj = JSON.parse(jsonStringList[i]);
-                this.state.carList.push(obj)
+                array.push(obj)
             }
-            /*
-            for (var i in this.state.carList) {
-                console.log(this.state.carList[i]["color"])
-            }
-            */
+            this.setState({carArray: array})
+            clearInterval(this.interval)
+            this.interval = setInterval(() => this.renderCarList(), 1000)
         }
     }
 
     componentDidMount() {
         this.checkSession()
         this.sendAwsRequest()
-        this.interval = setInterval(() => this.checkResponseAWS(), 1000)
+        this.interval = setInterval(() => this.checkAwsResponse(), 1000)
     }
 
     componentWillUnmount() {
