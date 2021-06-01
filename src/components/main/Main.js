@@ -2,6 +2,7 @@ import React from "react"
 import {withRouter} from "react-router-dom"
 import {ReactSession} from "react-client-session"
 import emailjs from "emailjs-com"
+import QRCode from "qrcode"
 import './style.css';
 
 
@@ -19,7 +20,8 @@ class Main extends React.Component {
             carImage: "",
             name: "",
             address: "",
-            email: ""
+            email: "",
+            qrcode: ""
         }
         this.onChangeName = this.onChangeName.bind(this)
         this.onChangeAddress = this.onChangeAddress.bind(this)
@@ -43,7 +45,6 @@ class Main extends React.Component {
                     <div>{this.renderCarList()}</div>
                 </div>
             </div>
-            
         );
     }
 
@@ -76,22 +77,76 @@ class Main extends React.Component {
                     <div className="Main-car-info-price">Price: {this.state.carPrice}</div>
 
                     <form className="Main-place-order-form" onSubmit={this.sendEmailPlaceOrder}>
-                            <p>Name</p>
-                            <input type="text" name="name" value={this.state.name} onChange={this.onChangeName}></input>
-                            <p>Address</p>
-                            <input type="text" name="address" value={this.state.address} onChange={this.onChangeAddress}></input>
-                            <p>Email</p>
-                            <input type="text" name="email" value={this.state.email} onChange={this.onChangeEmail}></input>
-                            <input hidden readOnly type="text" name="carBrand" value={this.state.carBrand} />
-                            <input hidden readOnly type="text" name="carModel" value={this.state.carModel} />
-                            <input hidden readOnly type="text" name="carColor" value={this.state.carColor} />
-                            <input hidden readOnly type="text" name="carPrice" value={this.state.carPrice} />
-                            <input hidden readOnly type="text" name="carImage" value={this.state.carImage} />
+                        <p>Name</p>
+                        <input type="text" name="name" value={this.state.name} onChange={this.onChangeName}></input>
+                        <p>Address</p>
+                        <input type="text" name="address" value={this.state.address} onChange={this.onChangeAddress}></input>
+                        <p>Email</p>
+                        <input type="text" name="email" value={this.state.email} onChange={this.onChangeEmail}></input>
+                        <input hidden readOnly type="text" name="carBrand" value={this.state.carBrand} />
+                        <input hidden readOnly type="text" name="carModel" value={this.state.carModel} />
+                        <input hidden readOnly type="text" name="carColor" value={this.state.carColor} />
+                        <input hidden readOnly type="text" name="carPrice" value={this.state.carPrice} />
+                        <input hidden readOnly type="text" name="carImage" value={this.state.carImage} />
                         <button>Place order</button>
+                    </form>
+
+                    <form className="Main-confirmation-order-form" onSubmit={this.sendEmailVINPlateQRCode}>
+                        <input hidden readOnly type="text" name="name" value={this.state.name} />
+                        <input hidden readOnly type="text" name="email" value={this.state.email} />
+                        <input hidden readOnly type="text" name="qrcode" value={this.state.qrcode} />
+                        <p>
+                            <button onClick={() => this.generateQRCode()}>Send QRCode Email</button>
+                        </p>
                     </form>
                 </div>
             )
         }
+    }
+
+    sendEmailPlaceOrder(e) {
+        e.preventDefault()
+        emailjs.sendForm('service_3et3hvh', 'template_jch835x', e.target, 'user_GM5dpQBFVEjwQwf8lh6Hz')
+        .then((result) => {
+            console.log(result.text);
+        }, (error) => {
+            console.log(error.text);
+        });
+        e.target.reset()
+    }
+
+    sendEmailVINPlateQRCode(e) {
+        console.log(e.target.name)
+        console.log(e.target.email)
+        console.log(e.target.qrcode)
+        e.preventDefault()
+        emailjs.sendForm('service_3et3hvh', 'template_pt6rlqi', e.target, 'user_GM5dpQBFVEjwQwf8lh6Hz')
+        .then((result) => {
+            console.log(result.text);
+        }, (error) => {
+            console.log(error.text);
+        });
+        e.target.reset()
+    }
+
+    generateQRCode = async () => {
+        try {
+            const qrcode = await QRCode.toDataURL("hello my friend")
+            this.setState({qrcode: qrcode})
+            console.log("qrcode: ", qrcode)
+        }
+        catch (error) {
+            console.log(error)
+        }
+    }
+
+    clickSelect(id, brand, model, color, price, image) {
+        this.setState({carId: id})
+        this.setState({carBrand: brand})
+        this.setState({carModel: model})
+        this.setState({carColor: color})
+        this.setState({carPrice: price})
+        this.setState({carImage: image})
     }
 
     request = async (api, data) => {
@@ -126,6 +181,19 @@ class Main extends React.Component {
         }
     }
 
+    clickHome = () => {
+        this.props.history.push("/")
+    }
+
+    clickProfile = () => {
+        this.props.history.push("/profile")
+    }
+
+    clickLogout = () => {
+        this.props.history.push("/")
+        ReactSession.set("username", null)
+    }
+
     checkSession() {
         var username = ReactSession.get("username")
         if (username === null) {
@@ -143,40 +211,6 @@ class Main extends React.Component {
 
     componentWillUnmount() {
         clearInterval(this.interval)
-    }   
-
-    sendEmailPlaceOrder(e) {
-        e.preventDefault()
-
-        emailjs.sendForm('service_3et3hvh', 'template_jch835x', e.target, 'user_GM5dpQBFVEjwQwf8lh6Hz')
-        .then((result) => {
-            console.log(result.text);
-        }, (error) => {
-            console.log(error.text);
-        });
-        e.target.reset()
-    }
-
-    clickSelect(id, brand, model, color, price, image) {
-        this.setState({carId: id})
-        this.setState({carBrand: brand})
-        this.setState({carModel: model})
-        this.setState({carColor: color})
-        this.setState({carPrice: price})
-        this.setState({carImage: image})
-    }
-
-    clickHome = () => {
-        this.props.history.push("/")
-    }
-
-    clickProfile = () => {
-        this.props.history.push("/profile")
-    }
-
-    clickLogout = () => {
-        this.props.history.push("/")
-        ReactSession.set("username", null)
     }
 
     onChangeName(event) {
