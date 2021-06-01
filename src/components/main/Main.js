@@ -76,19 +76,18 @@ class Main extends React.Component {
                     <div className="Main-car-info-price">Price: {this.state.carPrice}</div>
 
                     <form className="Main-place-order-form" onSubmit={this.sendEmailPlaceOrder}>
-                        <p>
-                            <label>Name</label>
+                            <p>Name</p>
                             <input type="text" name="name" value={this.state.name} onChange={this.onChangeName}></input>
-                        </p>
-                        <p>
-                            <label>Address</label>
+                            <p>Address</p>
                             <input type="text" name="address" value={this.state.address} onChange={this.onChangeAddress}></input>
-                        </p>
-                        <p>
-                            <label>Email</label>
+                            <p>Email</p>
                             <input type="text" name="email" value={this.state.email} onChange={this.onChangeEmail}></input>
-                        </p>
-                        <button onClick={() => this.clickPlaceOrder()}>Place order</button>
+                            <input hidden readOnly type="text" name="carBrand" value={this.state.carBrand} />
+                            <input hidden readOnly type="text" name="carModel" value={this.state.carModel} />
+                            <input hidden readOnly type="text" name="carColor" value={this.state.carColor} />
+                            <input hidden readOnly type="text" name="carPrice" value={this.state.carPrice} />
+                            <input hidden readOnly type="text" name="carImage" value={this.state.carImage} />
+                        <button>Place order</button>
                     </form>
                 </div>
             )
