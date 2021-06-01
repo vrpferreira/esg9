@@ -1,6 +1,7 @@
 import React from "react"
 import {withRouter} from "react-router-dom"
 import {ReactSession} from "react-client-session"
+import emailjs from 'emailjs-com'
 import './style.css';
 
 
@@ -73,7 +74,8 @@ class Main extends React.Component {
                     <div className="Main-car-info-model">Model: {this.state.carModel}</div>
                     <div className="Main-car-info-color">Color: {this.state.carColor}</div>
                     <div className="Main-car-info-price">Price: {this.state.carPrice}</div>
-                    <div className="Main-place-order-form">
+
+                    <form className="Main-place-order-form" onSubmit={this.sendEmailPlaceOrder}>
                         <p>
                             <label>Name</label>
                             <input type="text" name="name" value={this.state.name} onChange={this.onChangeName}></input>
@@ -87,7 +89,7 @@ class Main extends React.Component {
                             <input type="text" name="email" value={this.state.email} onChange={this.onChangeEmail}></input>
                         </p>
                         <button onClick={() => this.clickPlaceOrder()}>Place order</button>
-                    </div>
+                    </form>
                 </div>
             )
         }
@@ -144,10 +146,27 @@ class Main extends React.Component {
         clearInterval(this.interval)
     }   
 
+    sendEmailPlaceOrder(e) {
+        e.preventDefault()
+
+        emailjs.sendForm('service_3et3hvh', 'template_jch835x', e.target, 'user_GM5dpQBFVEjwQwf8lh6Hz')
+        .then((result) => {
+            console.log(result.text);
+        }, (error) => {
+            console.log(error.text);
+        });
+        e.target.reset()
+    }
+
     clickPlaceOrder() {
         var invalidName = this.isInvalid(this.state.email)
         var invalidAddress = this.isInvalid(this.state.email)
         var invalidEmail = this.isInvalid(this.state.email)
+
+        if (!invalidName && !invalidAddress && !invalidEmail) {
+            
+        }
+
         console.log("invalid name: ",invalidName)
         console.log("invalid address: ",invalidAddress)
         console.log("invalid email: ",invalidEmail)
