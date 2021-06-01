@@ -1,7 +1,7 @@
 import React from "react"
 import {withRouter} from "react-router-dom"
 import {ReactSession} from "react-client-session"
-import emailjs from 'emailjs-com'
+import emailjs from "emailjs-com"
 import './style.css';
 
 
@@ -57,7 +57,7 @@ class Main extends React.Component {
                         <div className="Main-car-info-brand">Brand: {car.brand}</div>
                         <div className="Main-car-info-model">Model: {car.model}</div>
                         <div className="Main-car-info-color">Color: {car.color}</div>
-                        <div className="Main-car-info-price">Price: {car.price}</div>
+                        <div className="Main-car-info-price">Price: {car.price}€</div>
                         <button onClick={() => this.clickSelect(car.id, car.brand, car.model, car.color, car.price, car.image)}>Select</button>
                     </div>
                 ))}
@@ -155,20 +155,6 @@ class Main extends React.Component {
             console.log(error.text);
         });
         e.target.reset()
-    }
-
-    clickPlaceOrder() {
-        var invalidName = this.isInvalid(this.state.email)
-        var invalidAddress = this.isInvalid(this.state.email)
-        var invalidEmail = this.isInvalid(this.state.email)
-
-        if (!invalidName && !invalidAddress && !invalidEmail) {
-            
-        }
-
-        console.log("invalid name: ",invalidName)
-        console.log("invalid address: ",invalidAddress)
-        console.log("invalid email: ",invalidEmail)
     }
 
     clickSelect(id, brand, model, color, price, image) {
