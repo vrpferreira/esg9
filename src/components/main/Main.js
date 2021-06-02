@@ -32,7 +32,7 @@ class Main extends React.Component {
         return (
             <div className="Main">
                 <div className="Main-topbar">
-                    <label className="Main-topbar-user">User</label>
+                    <label className="Main-topbar-user">{ReactSession.get("username")}</label>
                     <button className="Main-topbar-button-logout" onClick={this.clickLogout}>Logout</button>
                     <button className="Main-topbar-button-home" onClick={this.clickHome}>Home</button>
                 </div>
@@ -40,7 +40,7 @@ class Main extends React.Component {
                     <header>Place order</header>
                     {this.renderCarAndFieldsPlaceOrder()}
                 </div>
-                <div>
+                <div className="Main-car-list">
                     <div>{this.renderCarList()}</div>
                 </div>
             </div>
@@ -51,7 +51,7 @@ class Main extends React.Component {
         return(
             <div className="Cars">
                 {this.state.carArray.map(car => (
-                    <div className = "Main-car-info" key={car.id}>
+                    <div className="Main-car-info" key={car.id}>
                         <img src={car.image} alt="Car"/>
                         <div className="Main-car-info-brand">Brand: {car.brand}</div>
                         <div className="Main-car-info-model">Model: {car.model}</div>
