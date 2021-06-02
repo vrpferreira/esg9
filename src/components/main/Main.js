@@ -52,11 +52,11 @@ class Main extends React.Component {
             <div className="Cars">
                 {this.state.carArray.map(car => (
                     <div className="Main-car-info" key={car.id}>
-                        <img src={car.image} alt="Car"/>
-                        <div className="Main-car-info-brand">Brand: {car.brand}</div>
-                        <div className="Main-car-info-model">Model: {car.model}</div>
-                        <div className="Main-car-info-color">Color: {car.color}</div>
-                        <div className="Main-car-info-price">Price: {car.price}€</div>
+                        <img className="Main-car-info-image" src={car.image} alt="Car"/>
+                        <div>Brand: {car.brand}</div>
+                        <div>Model: {car.model}</div>
+                        <div>Color: {car.color}</div>
+                        <div>Price: {car.price}€</div>
                         <button onClick={() => this.clickSelect(car.id, car.brand, car.model, car.color, car.price, car.image)}>Select</button>
                     </div>
                 ))}
@@ -68,12 +68,13 @@ class Main extends React.Component {
         if (this.state.carId !== 0) {
             return(
                 <div>
-                    <img src={this.state.carImage} alt="Car"/>
-                    <div className="Main-car-info-brand">Brand: {this.state.carBrand}</div>
-                    <div className="Main-car-info-model">Model: {this.state.carModel}</div>
-                    <div className="Main-car-info-color">Color: {this.state.carColor}</div>
-                    <div className="Main-car-info-price">Price: {this.state.carPrice}</div>
-
+                    <div className="Main-place-order-panel-car">
+                        <img src={this.state.carImage} alt="Car"/>
+                        <div>Brand: {this.state.carBrand}</div>
+                        <div>Model: {this.state.carModel}</div>
+                        <div>Color: {this.state.carColor}</div>
+                        <div>Price: {this.state.carPrice}</div>
+                    </div>
                     <form className="Main-place-order-form" onSubmit={this.sendEmailPlaceOrder}>
                         <p>Name</p>
                         <input type="text" name="name" value={this.state.name} onChange={this.onChangeName}></input>
