@@ -31,16 +31,15 @@ class Main extends React.Component {
     render() {
         return (
             <div className="Main">
-                <header>User: {ReactSession.get("username")}</header>
-                <header className="Main-header">Main Header</header>
-                <button onClick={this.clickHome}>Home</button>
-                <button onClick={this.clickProfile}>Profile</button>
-                <button onClick={this.clickLogout}>Logout</button>
+                <div className="Main-topbar">
+                    <label className="Main-topbar-user">User</label>
+                    <button className="Main-topbar-button-logout" onClick={this.clickLogout}>Logout</button>
+                    <button className="Main-topbar-button-home" onClick={this.clickHome}>Home</button>
+                </div>
                 <div className="Main-place-order-panel">
                     <header>Place order</header>
                     {this.renderCarAndFieldsPlaceOrder()}
                 </div>
-                <div>Selected car id: {this.state.carId}</div>
                 <div>
                     <div>{this.renderCarList()}</div>
                 </div>
@@ -51,7 +50,6 @@ class Main extends React.Component {
     renderCarList() {
         return(
             <div className="Cars">
-                <header>Cars</header>
                 {this.state.carArray.map(car => (
                     <div className = "Main-car-info" key={car.id}>
                         <img src={car.image} alt="Car"/>
@@ -91,7 +89,7 @@ class Main extends React.Component {
                         <button>Place order</button>
                     </form>
 
-                    <form className="Main-confirmation-order-form" onSubmit={this.sendEmailVINPlateQRCode}>
+                    <form className="Main-confirmation-order-form" onSubmit={this.sendEmailConfirmationOrder}>
                         <input hidden readOnly type="text" name="name" value={this.state.name} />
                         <input hidden readOnly type="text" name="email" value={this.state.email} />
                         <input hidden readOnly type="text" name="qrcode" value={this.state.qrcode} />
@@ -115,10 +113,7 @@ class Main extends React.Component {
         e.target.reset()
     }
 
-    sendEmailVINPlateQRCode(e) {
-        console.log(e.target.name)
-        console.log(e.target.email)
-        console.log(e.target.qrcode)
+    sendEmailConfirmationOrder(e) {
         e.preventDefault()
         emailjs.sendForm('service_3et3hvh', 'template_pt6rlqi', e.target, 'user_GM5dpQBFVEjwQwf8lh6Hz')
         .then((result) => {

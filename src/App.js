@@ -4,7 +4,6 @@ import Home from './components/home/Home'
 import Register from './components/register/Register'
 import Login from './components/login/Login'
 import Main from './components/main/Main'
-import Profile from './components/profile/Profile'
 import LoginFirst from './components/loginfirst/LoginFirst'
 import {ReactSession} from "react-client-session"
 
@@ -22,7 +21,6 @@ class App extends React.Component {
                     <Route path="/register" component={Register} />
                     <Route path="/login" component={Login} />
                     <Route path="/main" component={Main} />
-                    <Route path="/profile" component={Profile} />
                     <Route path="/loginfirst" component={LoginFirst} />
                 </div>
             </Router>
