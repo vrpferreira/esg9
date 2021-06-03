@@ -80,7 +80,7 @@ class Main extends React.Component {
                         <div>Price: {this.state.carPrice}</div>
                     </div>
                     
-                    <form className="Main-place-order-form" onSubmit={this.sendEmailPlaceOrder}>
+                    <div className="Main-place-order-form">
                         <p>Name</p>
                         <input type="text" name="name" value={this.state.name} onChange={this.onChangeName}></input>
                         <p>Address</p>
@@ -92,8 +92,8 @@ class Main extends React.Component {
                         <input hidden readOnly type="text" name="carColor" value={this.state.carColor} />
                         <input hidden readOnly type="text" name="carPrice" value={this.state.carPrice} />
                         <input hidden readOnly type="text" name="carImage" value={this.state.carImage} />
-                        <button>Place order</button>
-                    </form>
+                        <button onClick={() => this.sendEmailPlaceOrder(this.state.name, this.state.address, this.state.email, this.state.carBrand, this.state.carModel, this.state.carColor, this.state.carPrice, this.state.carImage)}>Place Order</button>
+                    </div>
 
                     <div className="Main-confirmation-order-form">
                         <input hidden readOnly type="text" name="name" value={this.state.name} />
@@ -101,10 +101,6 @@ class Main extends React.Component {
                         <input hidden readOnly type="text" name="vin" value={this.state.receivedVIN} />
                         <input hidden readOnly type="text" name="plate" value={this.state.licensePlate} />
                         <input hidden readOnly type="text" name="qrcode" value={this.state.qrcode} />
-                        <p>
-                        <button onClick={() => this.AwsRequestVIN()}>Request VIN</button>
-                        <button onClick={() => this.sendEmailConfirmationOrder(this.state.name, this.state.email, this.state.receivedVIN, this.state.licensePlate, this.state.qrcode)}>Send email</button>
-                        </p>
                     </div>
                 </div>
             )
@@ -112,18 +108,27 @@ class Main extends React.Component {
     }
 
 
-    sendEmailPlaceOrder(e) {
-        e.preventDefault()
-        emailjs.sendForm('service_3et3hvh', 'template_jch835x', e.target, 'user_GM5dpQBFVEjwQwf8lh6Hz')
+    sendEmailPlaceOrder(name, address, email, brand, model, color, price, image) {
+        var templateParams = {
+            email: email,
+            name: name,
+            address: address,
+            brand: brand,
+            model: model,
+            color: color,
+            price: price,
+            image: image
+        };
+
+        emailjs.send('service_3et3hvh', 'template_jch835x', templateParams, 'user_GM5dpQBFVEjwQwf8lh6Hz')
         .then((result) => {
             console.log(result.text);
         }, (error) => {
             console.log(error.text);
         });
-        e.target.reset()
 
         //ask for vin
-
+        this.AwsRequestVIN()
     }
 
 
@@ -136,24 +141,13 @@ class Main extends React.Component {
             plate: plate
         };
 
-        console.log("send email")
+        console.log("sendEmailConfirmationOrder")
         emailjs.send('service_3et3hvh', 'template_pt6rlqi', templateParams, 'user_GM5dpQBFVEjwQwf8lh6Hz')
         .then((result) => {
             console.log(result.text);
         }, (error) => {
             console.log(error.text);
         });
-    }
-
-
-    generateQRCode = async () => {
-        try {
-            const qrcode = await QRCode.toDataURL("Thank you! VIN: " + this.state.receivedVIN + " and LICENSE PLATE: "+ this.state.licensePlate)
-            this.setState({qrcode: qrcode})
-        }
-        catch (error) {
-            console.log(error)
-        }
     }
 
 
@@ -310,7 +304,21 @@ class Main extends React.Component {
 
             console.log("VIN: ", this.state.receivedVIN)
             console.log("PLATE: ", this.state.licensePlate)
-            this.generateQRCode()
+
+            this.interval = setInterval(() => this.generateQRCode(), 1000)
+        }
+    }
+
+    generateQRCode = async () => {
+        try {
+            const qrcode = await QRCode.toDataURL("Thank you! VIN: " + this.state.receivedVIN + " and LICENSE PLATE: "+ this.state.licensePlate)
+            this.setState({qrcode: qrcode})
+            this.sendEmailConfirmationOrder(this.state.name, this.state.email, this.state.receivedVIN, this.state.licensePlate, this.state.qrcode)
+
+            clearInterval(this.interval)
+        }
+        catch (error) {
+            console.log(error)
         }
     }
 
