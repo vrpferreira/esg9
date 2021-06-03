@@ -95,23 +95,17 @@ class Main extends React.Component {
                         <button>Place order</button>
                     </form>
 
-                    <form className="Main-confirmation-order-form" onSubmit={this.sendEmailConfirmationOrder}>
+                    <div className="Main-confirmation-order-form">
                         <input hidden readOnly type="text" name="name" value={this.state.name} />
                         <input hidden readOnly type="text" name="email" value={this.state.email} />
+                        <input hidden readOnly type="text" name="vin" value={this.state.receivedVIN} />
+                        <input hidden readOnly type="text" name="plate" value={this.state.licensePlate} />
                         <input hidden readOnly type="text" name="qrcode" value={this.state.qrcode} />
                         <p>
-                            <button onClick={() => this.generateQRCode()}>Send QRCode Email</button>
-                        </p>
-                    </form>
-                    <p>
                         <button onClick={() => this.AwsRequestVIN()}>Request VIN</button>
-                    </p>
-                    <p>
-                        <button onClick={() => this.AwsSendVIN()}>Send VIN to AWS SQS</button>
-                    </p>
-                    <p>
-                        <button onClick={() => this.AwsRequestLicensePlate()}>Receive Plate AWS SQS</button>
-                    </p>
+                        <button onClick={() => this.sendEmailConfirmationOrder(this.state.name, this.state.email, this.state.receivedVIN, this.state.licensePlate, this.state.qrcode)}>Send email</button>
+                        </p>
+                    </div>
                 </div>
             )
         }
@@ -133,21 +127,28 @@ class Main extends React.Component {
     }
 
 
-    sendEmailConfirmationOrder(e) {
-        e.preventDefault()
-        emailjs.sendForm('service_3et3hvh', 'template_pt6rlqi', e.target, 'user_GM5dpQBFVEjwQwf8lh6Hz')
+    sendEmailConfirmationOrder(name, email, vin, plate, qrcode) {
+        var templateParams = {
+            email: email,
+            name: name,
+            vin: vin,
+            qrcode: qrcode,
+            plate: plate
+        };
+
+        console.log("send email")
+        emailjs.send('service_3et3hvh', 'template_pt6rlqi', templateParams, 'user_GM5dpQBFVEjwQwf8lh6Hz')
         .then((result) => {
             console.log(result.text);
         }, (error) => {
             console.log(error.text);
         });
-        e.target.reset()
     }
 
 
     generateQRCode = async () => {
         try {
-            const qrcode = await QRCode.toDataURL("hello my friend")
+            const qrcode = await QRCode.toDataURL("Thank you! VIN: " + this.state.receivedVIN + " and LICENSE PLATE: "+ this.state.licensePlate)
             this.setState({qrcode: qrcode})
         }
         catch (error) {
@@ -309,6 +310,7 @@ class Main extends React.Component {
 
             console.log("VIN: ", this.state.receivedVIN)
             console.log("PLATE: ", this.state.licensePlate)
+            this.generateQRCode()
         }
     }
 
