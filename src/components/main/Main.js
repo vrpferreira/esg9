@@ -226,7 +226,7 @@ class Main extends React.Component {
     request = async (api, data) => {
         const response = await fetch(api, data)
         const json = await response.json()
-        console.log("vin_sent: ", json.vin_sent)
+        console.log("vin_react: ", json.vin_react)
     }
 
 
