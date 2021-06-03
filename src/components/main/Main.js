@@ -21,7 +21,8 @@ class Main extends React.Component {
             address: "",
             email: "",
             qrcode: "",
-            licensePlate: ""
+            licensePlate: "",
+            receivedVIN: ""
         }
         this.onChangeName = this.onChangeName.bind(this)
         this.onChangeAddress = this.onChangeAddress.bind(this)
@@ -103,6 +104,9 @@ class Main extends React.Component {
                         </p>
                     </form>
                     <p>
+                        <button onClick={() => this.AwsRequestVIN()}>Request VIN</button>
+                    </p>
+                    <p>
                         <button onClick={() => this.AwsSendVIN()}>Send VIN to AWS SQS</button>
                     </p>
                     <p>
@@ -123,6 +127,9 @@ class Main extends React.Component {
             console.log(error.text);
         });
         e.target.reset()
+
+        //ask for vin
+
     }
 
 
@@ -156,6 +163,39 @@ class Main extends React.Component {
         this.setState({carColor: color})
         this.setState({carPrice: price})
         this.setState({carImage: image})
+    }
+
+
+    /*
+    Send id to Country Distributor and ask for a VIN
+    */
+    AwsRequestVIN() {
+        console.log("request vin")
+        const api = 'https://0c936jjw26.execute-api.us-east-1.amazonaws.com/dev/res-getcarstock'
+        const data = {
+            method: 'POST',
+                headers: {
+                    'Accept': 'application/json',
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(
+                    {
+                        "id" : this.state.carId
+                    }
+                )
+        }
+        this.requestVIN(api, data);
+    }
+
+
+    /*
+    Send request to AWS (VIN) and wait for response
+    */
+    requestVIN = async (api, data) => {
+        const response = await fetch(api, data)
+        const json = await response.json()
+        console.log("vin: ", json.message)
+        this.setState({receivedVIN: json.message})
     }
 
 
@@ -196,7 +236,7 @@ class Main extends React.Component {
 
 
     /*
-    Send VIN to Country Distributor (AWS SQS)
+    Send VIN to National Auto Registry (AWS SQS)
     */
     AwsSendVIN() {
         console.log("send vin")
