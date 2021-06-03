@@ -10,7 +10,6 @@ class Main extends React.Component {
     constructor(props) {
         super(props);
         this.state = {
-            body: null,
             carArray: [],
             carId: 0,
             carBrand: "",
@@ -28,6 +27,7 @@ class Main extends React.Component {
         this.onChangeAddress = this.onChangeAddress.bind(this)
         this.onChangeEmail = this.onChangeEmail.bind(this)
     }
+
 
     render() {
         return (
@@ -48,6 +48,7 @@ class Main extends React.Component {
         );
     }
 
+
     renderCarList() {
         return(
             <div className="Cars">
@@ -64,6 +65,7 @@ class Main extends React.Component {
             </div>
         );
     }
+
 
     renderCarAndFieldsPlaceOrder() {
         if (this.state.carId !== 0) {
@@ -104,12 +106,13 @@ class Main extends React.Component {
                         <button onClick={() => this.AwsSendVIN()}>Send VIN to AWS SQS</button>
                     </p>
                     <p>
-                        <button onClick={() => this.AwsReceiveLicensePlate()}>Receive Plate AWS SQS</button>
+                        <button onClick={() => this.AwsRequestLicensePlate()}>Receive Plate AWS SQS</button>
                     </p>
                 </div>
             )
         }
     }
+
 
     sendEmailPlaceOrder(e) {
         e.preventDefault()
@@ -122,6 +125,7 @@ class Main extends React.Component {
         e.target.reset()
     }
 
+
     sendEmailConfirmationOrder(e) {
         e.preventDefault()
         emailjs.sendForm('service_3et3hvh', 'template_pt6rlqi', e.target, 'user_GM5dpQBFVEjwQwf8lh6Hz')
@@ -133,6 +137,7 @@ class Main extends React.Component {
         e.target.reset()
     }
 
+
     generateQRCode = async () => {
         try {
             const qrcode = await QRCode.toDataURL("hello my friend")
@@ -143,6 +148,7 @@ class Main extends React.Component {
         }
     }
 
+
     clickSelect(id, brand, model, color, price, image) {
         this.setState({carId: id})
         this.setState({carBrand: brand})
@@ -152,12 +158,10 @@ class Main extends React.Component {
         this.setState({carImage: image})
     }
 
-    request = async (api, data) => {
-        const response = await fetch(api, data)
-        const json = await response.json()
-        this.setState({body: json.body})
-    }
 
+    /*
+    Request the list of cars
+    */
     AwsRequestCarList() {
         const api = 'https://zdzw8gz3xf.execute-api.us-east-1.amazonaws.com/stage/res-getcarslist'
         const data = {
@@ -167,29 +171,33 @@ class Main extends React.Component {
                 'Content-Type': 'application/json'
             }
         }
-        this.request(api, data);
+        this.requestCarList(api, data);
     }
 
-    HandleCarList() {
-        if (this.state.body != null && this.state.carArray.length === 0) {
-            //convert and add cars to this.state.carList
-            var jsonString = JSON.parse(this.state.body);
-            var jsonStringList = jsonString.split(/\n/)
-            var array = []
-            for (var i in jsonStringList) {
-                var obj = JSON.parse(jsonStringList[i]);
-                array.push(obj)
-            }
-            this.setState({carArray: array})
-        }
-    }
 
-    requestLicensePlate = async (api, data) => {
+    /*
+    Send request to AWS (list of cars) and wait for response
+    */
+    requestCarList = async (api, data) => {
+        //Send request and waits for response
         const response = await fetch(api, data)
         const json = await response.json()
-        this.setState({licensePlate: json.license_plate})
+
+        //Handle AWS response (list of cars)
+        var jsonString = JSON.parse(json.body);
+        var jsonStringList = jsonString.split(/\n/)
+        var array = []
+        for (var i in jsonStringList) {
+            var obj = JSON.parse(jsonStringList[i]);
+            array.push(obj)
+        }
+        this.setState({carArray: array})
     }
 
+
+    /*
+    Send VIN to Country Distributor (AWS SQS)
+    */
     AwsSendVIN() {
         console.log("send vin")
         const api = 'https://nv3zrup082.execute-api.us-east-1.amazonaws.com/stage/res-sendtosqs'
@@ -206,10 +214,26 @@ class Main extends React.Component {
                 )
         }
         this.request(api, data);
+
+        //After send VIN, keep request the according license plate
+        this.interval = setInterval(() => this.AwsRequestLicensePlate(), 1000)
     }
 
-    AwsReceiveLicensePlate() {
-        console.log("receive plate")
+
+    /*
+    Send request to AWS (VIN) and wait for response
+    */
+    request = async (api, data) => {
+        const response = await fetch(api, data)
+        const json = await response.json()
+        console.log("vin_sent: ", json.vin_sent)
+    }
+
+
+    /*
+    Request the license plate
+    */
+    AwsRequestLicensePlate() {
         const api = 'https://nv3zrup082.execute-api.us-east-1.amazonaws.com/stage/res-receivefromsqs'
         const data = {
             method: 'POST',
@@ -224,31 +248,43 @@ class Main extends React.Component {
                 )
         }
         this.requestLicensePlate(api, data);
-        this.interval = setInterval(() => this.HandleLicensePlate(), 1000)
     }
 
-    HandleLicensePlate() {
-        console.log("this.state.licensePlate: ", this.state.licensePlate)
-        if (this.state.body != null) {
-            //convert and add cars to this.state.carList
-            var jsonString = JSON.parse(this.state.body);
-            this.setState({licensePlate: jsonString})
-            console.log("licensePlate: ", jsonString)
+
+    /*
+    Send request to AWS (list of cars) and wait for response
+    */
+    requestLicensePlate = async (api, data) => {
+        //Send request and waits for response
+        const response = await fetch(api, data)
+        const json = await response.json()
+
+        console.log('vin_react:', json.vin_react)
+        console.log('vin_sqs:', json.vin_sqs)
+        console.log('license_plate:', json.license_plate)
+
+        if (json.license_plate.length > 0) {
+            clearInterval(this.interval)
+            this.setState({licensePlate: json.license_plate})
         }
     }
+
 
     clickHome = () => {
         this.props.history.push("/")
     }
 
+
     clickProfile = () => {
         this.props.history.push("/profile")
     }
+
 
     clickLogout = () => {
         this.props.history.push("/")
         ReactSession.set("username", null)
     }
+
 
     checkSession() {
         var username = ReactSession.get("username")
@@ -260,26 +296,31 @@ class Main extends React.Component {
         }
     }
 
+
     componentDidMount() {
         this.checkSession()
-        this.interval = setInterval(() => this.HandleCarList(), 1000)
     }
+
 
     componentWillUnmount() {
         clearInterval(this.interval)
     }
 
+
     onChangeName(event) {
         this.setState({name : event.target.value})
     }
+
 
     onChangeAddress(event) {
         this.setState({address : event.target.value})
     }
 
+
     onChangeEmail(event) {
         this.setState({email : event.target.value})
     }
+
 
     isInvalid(string) {
         return (string.length === 0 || !string.trim())
