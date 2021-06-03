@@ -21,7 +21,8 @@ class Main extends React.Component {
             name: "",
             address: "",
             email: "",
-            qrcode: ""
+            qrcode: "",
+            licensePlate: ""
         }
         this.onChangeName = this.onChangeName.bind(this)
         this.onChangeAddress = this.onChangeAddress.bind(this)
@@ -69,12 +70,13 @@ class Main extends React.Component {
             return(
                 <div>
                     <div className="Main-place-order-panel-car">
-                        <img src={this.state.carImage} alt="Car"/>
+                        <img className="Main-place-order-panel-car-image" src={this.state.carImage} alt="Car"/>
                         <div>Brand: {this.state.carBrand}</div>
                         <div>Model: {this.state.carModel}</div>
                         <div>Color: {this.state.carColor}</div>
                         <div>Price: {this.state.carPrice}</div>
                     </div>
+                    
                     <form className="Main-place-order-form" onSubmit={this.sendEmailPlaceOrder}>
                         <p>Name</p>
                         <input type="text" name="name" value={this.state.name} onChange={this.onChangeName}></input>
@@ -98,6 +100,12 @@ class Main extends React.Component {
                             <button onClick={() => this.generateQRCode()}>Send QRCode Email</button>
                         </p>
                     </form>
+                    <p>
+                        <button onClick={() => this.AwsSendVIN()}>Send VIN to AWS SQS</button>
+                    </p>
+                    <p>
+                        <button onClick={() => this.AwsReceiveLicensePlate()}>Receive Plate AWS SQS</button>
+                    </p>
                 </div>
             )
         }
@@ -129,7 +137,6 @@ class Main extends React.Component {
         try {
             const qrcode = await QRCode.toDataURL("hello my friend")
             this.setState({qrcode: qrcode})
-            console.log("qrcode: ", qrcode)
         }
         catch (error) {
             console.log(error)
@@ -151,7 +158,7 @@ class Main extends React.Component {
         this.setState({body: json.body})
     }
 
-    sendAwsRequest() {
+    AwsRequestCarList() {
         const api = 'https://zdzw8gz3xf.execute-api.us-east-1.amazonaws.com/stage/res-getcarslist'
         const data = {
             method: 'GET',
@@ -163,7 +170,7 @@ class Main extends React.Component {
         this.request(api, data);
     }
 
-    receiveAwsResponse() {
+    HandleCarList() {
         if (this.state.body != null && this.state.carArray.length === 0) {
             //convert and add cars to this.state.carList
             var jsonString = JSON.parse(this.state.body);
@@ -174,6 +181,59 @@ class Main extends React.Component {
                 array.push(obj)
             }
             this.setState({carArray: array})
+        }
+    }
+
+    requestLicensePlate = async (api, data) => {
+        const response = await fetch(api, data)
+        const json = await response.json()
+        this.setState({licensePlate: json.license_plate})
+    }
+
+    AwsSendVIN() {
+        console.log("send vin")
+        const api = 'https://nv3zrup082.execute-api.us-east-1.amazonaws.com/stage/res-sendtosqs'
+        const data = {
+            method: 'POST',
+                headers: {
+                    'Accept': 'application/json',
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(
+                    {
+                        "vin" : "JH4CU2E50E00137910000000"
+                    }
+                )
+        }
+        this.request(api, data);
+    }
+
+    AwsReceiveLicensePlate() {
+        console.log("receive plate")
+        const api = 'https://nv3zrup082.execute-api.us-east-1.amazonaws.com/stage/res-receivefromsqs'
+        const data = {
+            method: 'POST',
+                headers: {
+                    'Accept': 'application/json',
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(
+                    {
+                        "vin" : "JH4CU2E50E00137910000000"
+                    }
+                )
+        }
+        this.requestLicensePlate(api, data);
+        this.interval = setInterval(() => this.HandleLicensePlate(), 1000)
+    }
+
+    HandleLicensePlate() {
+        console.log("this.state.licensePlate: ", this.state.licensePlate)
+        if (this.state.body != null) {
+            //convert and add cars to this.state.carList
+            var jsonString = JSON.parse(this.state.body);
+            this.setState({licensePlate: jsonString})
+            console.log("licensePlate: ", jsonString)
         }
     }
 
@@ -196,13 +256,13 @@ class Main extends React.Component {
             this.props.history.push("/loginfirst")
         }
         else {
-            this.sendAwsRequest()
+            this.AwsRequestCarList()
         }
     }
 
     componentDidMount() {
         this.checkSession()
-        this.interval = setInterval(() => this.receiveAwsResponse(), 1000)
+        this.interval = setInterval(() => this.HandleCarList(), 1000)
     }
 
     componentWillUnmount() {
