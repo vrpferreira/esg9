@@ -132,13 +132,19 @@ class Main extends React.Component {
     }
 
 
-    sendEmailConfirmationOrder(name, email, vin, plate, qrcode) {
+    sendEmailConfirmationOrder(name, email, brand, model, color, vin, plate, qrcode) {
+        var message = ""
+        if (this.state.receivedVIN === "FAIL") {
+            message = "This car is out of stock!"
+        }
+        else {
+            message = "Brand: " + brand + " // Model: " + model + " // Color: " + color + " // VIN: " + vin + " // License Plate: " + plate
+        }
         var templateParams = {
             email: email,
             name: name,
-            vin: vin,
             qrcode: qrcode,
-            plate: plate
+            message: message
         };
 
         console.log("sendEmailConfirmationOrder")
@@ -235,25 +241,33 @@ class Main extends React.Component {
     Send VIN to National Auto Registry (AWS SQS)
     */
     AwsSendVIN() {
+        console.log("AwsSendVIN: ", this.state.receivedVIN)
         if (this.state.receivedVIN.length > 0) {
-            clearInterval(this.interval)
-            const api = 'https://nv3zrup082.execute-api.us-east-1.amazonaws.com/stage/res-sendtosqs'
-            const data = {
-                method: 'POST',
-                    headers: {
-                        'Accept': 'application/json',
-                        'Content-Type': 'application/json'
-                    },
-                    body: JSON.stringify(
-                        {
-                            "vin" : this.state.receivedVIN
-                        }
-                    )
-            }
-            this.request(api, data);
+            if (this.state.receivedVIN !== "FAIL") {
+                clearInterval(this.interval)
+                const api = 'https://nv3zrup082.execute-api.us-east-1.amazonaws.com/stage/res-sendtosqs'
+                const data = {
+                    method: 'POST',
+                        headers: {
+                            'Accept': 'application/json',
+                            'Content-Type': 'application/json'
+                        },
+                        body: JSON.stringify(
+                            {
+                                "vin" : this.state.receivedVIN
+                            }
+                        )
+                }
+                this.request(api, data);
 
-            //After send VIN, keep request the according license plate
-            this.interval = setInterval(() => this.AwsRequestLicensePlate(), 1000)
+                //After send VIN, keep request the according license plate
+                this.interval = setInterval(() => this.AwsRequestLicensePlate(), 1000)
+            }
+            else {
+                clearInterval(this.interval)
+                this.setState({qrcode: "Unavailable"})
+                this.sendEmailConfirmationOrder(this.state.name, this.state.email, this.state.carBrand, this.state.carModel, this.state.carColor, this.state.receivedVIN, this.state.licensePlate, this.state.qrcode)
+            }
         }
     }
 
@@ -313,7 +327,7 @@ class Main extends React.Component {
         try {
             const qrcode = await QRCode.toDataURL("Thank you! VIN: " + this.state.receivedVIN + " and LICENSE PLATE: "+ this.state.licensePlate)
             this.setState({qrcode: qrcode})
-            this.sendEmailConfirmationOrder(this.state.name, this.state.email, this.state.receivedVIN, this.state.licensePlate, this.state.qrcode)
+            this.sendEmailConfirmationOrder(this.state.name, this.state.email, this.state.carBrand, this.state.carModel, this.state.carColor, this.state.receivedVIN, this.state.licensePlate, this.state.qrcode)
 
             clearInterval(this.interval)
         }
