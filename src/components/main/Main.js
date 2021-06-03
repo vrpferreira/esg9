@@ -167,39 +167,6 @@ class Main extends React.Component {
 
 
     /*
-    Send id to Country Distributor and ask for a VIN
-    */
-    AwsRequestVIN() {
-        console.log("request vin")
-        const api = 'https://0c936jjw26.execute-api.us-east-1.amazonaws.com/dev/res-getcarstock'
-        const data = {
-            method: 'POST',
-                headers: {
-                    'Accept': 'application/json',
-                    'Content-Type': 'application/json'
-                },
-                body: JSON.stringify(
-                    {
-                        "id" : this.state.carId
-                    }
-                )
-        }
-        this.requestVIN(api, data);
-    }
-
-
-    /*
-    Send request to AWS (VIN) and wait for response
-    */
-    requestVIN = async (api, data) => {
-        const response = await fetch(api, data)
-        const json = await response.json()
-        console.log("vin: ", json.message)
-        this.setState({receivedVIN: json.message})
-    }
-
-
-    /*
     Request the list of cars
     */
     AwsRequestCarList() {
@@ -236,11 +203,10 @@ class Main extends React.Component {
 
 
     /*
-    Send VIN to National Auto Registry (AWS SQS)
+    Send id to Country Distributor and ask for a VIN
     */
-    AwsSendVIN() {
-        console.log("send vin")
-        const api = 'https://nv3zrup082.execute-api.us-east-1.amazonaws.com/stage/res-sendtosqs'
+    AwsRequestVIN() {
+        const api = 'https://0c936jjw26.execute-api.us-east-1.amazonaws.com/dev/res-getcarstock'
         const data = {
             method: 'POST',
                 headers: {
@@ -249,14 +215,51 @@ class Main extends React.Component {
                 },
                 body: JSON.stringify(
                     {
-                        "vin" : "JH4CU2E50E00137910000000"
+                        "id" : this.state.carId
                     }
                 )
         }
-        this.request(api, data);
+        this.requestVIN(api, data);
 
-        //After send VIN, keep request the according license plate
-        this.interval = setInterval(() => this.AwsRequestLicensePlate(), 1000)
+        //After send id and received a VIN, send VIN to Registry
+        this.interval = setInterval(() => this.AwsSendVIN(), 1000)
+    }
+
+
+    /*
+    Send request to AWS (VIN) and wait for response
+    */
+    requestVIN = async (api, data) => {
+        const response = await fetch(api, data)
+        const json = await response.json()
+        this.setState({receivedVIN: json.message})
+    }
+
+
+    /*
+    Send VIN to National Auto Registry (AWS SQS)
+    */
+    AwsSendVIN() {
+        if (this.state.receivedVIN.length > 0) {
+            clearInterval(this.interval)
+            const api = 'https://nv3zrup082.execute-api.us-east-1.amazonaws.com/stage/res-sendtosqs'
+            const data = {
+                method: 'POST',
+                    headers: {
+                        'Accept': 'application/json',
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(
+                        {
+                            "vin" : this.state.receivedVIN
+                        }
+                    )
+            }
+            this.request(api, data);
+
+            //After send VIN, keep request the according license plate
+            this.interval = setInterval(() => this.AwsRequestLicensePlate(), 1000)
+        }
     }
 
 
@@ -266,7 +269,7 @@ class Main extends React.Component {
     request = async (api, data) => {
         const response = await fetch(api, data)
         const json = await response.json()
-        console.log("vin_react: ", json.vin_react)
+        console.log(json)
     }
 
 
@@ -283,7 +286,7 @@ class Main extends React.Component {
                 },
                 body: JSON.stringify(
                     {
-                        "vin" : "JH4CU2E50E00137910000000"
+                        "vin" : this.state.receivedVIN
                     }
                 )
         }
@@ -299,13 +302,13 @@ class Main extends React.Component {
         const response = await fetch(api, data)
         const json = await response.json()
 
-        console.log('vin_react:', json.vin_react)
-        console.log('vin_sqs:', json.vin_sqs)
-        console.log('license_plate:', json.license_plate)
 
-        if (json.license_plate.length > 0) {
+        if (json.license_plate.length > 0 && this.state.licensePlate.length === 0) {
             clearInterval(this.interval)
             this.setState({licensePlate: json.license_plate})
+
+            console.log("VIN: ", this.state.receivedVIN)
+            console.log("PLATE: ", this.state.licensePlate)
         }
     }
 
