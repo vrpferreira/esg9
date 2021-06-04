@@ -33,7 +33,6 @@ class Login extends React.Component {
                     </p>
                 </div>
                 <button className="Login-button-login" onClick={this.clickLogin}>Login</button>
-                <button className='Login-button-forgot-password' onClick={this.clickForgotPassword}>Forgot Password</button>
                 <button className="Login-button-home" onClick={this.clickHome}>Home</button>
                 <div className={this.state.messageCSS}>
                     <p>{this.state.message}</p>
@@ -45,10 +44,6 @@ class Login extends React.Component {
     clickLogin = () => {
         this.sendAwsRequest()
     };
-
-    clickForgotPassword = () => {
-        this.props.history.push("/")
-    }
 
     clickHome = () => {
         this.props.history.push("/")

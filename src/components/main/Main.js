@@ -22,7 +22,8 @@ class Main extends React.Component {
             email: "",
             qrcode: "",
             licensePlate: "",
-            receivedVIN: ""
+            receivedVIN: "",
+            deliveryDate: ""
         }
         this.onChangeName = this.onChangeName.bind(this)
         this.onChangeAddress = this.onChangeAddress.bind(this)
@@ -120,7 +121,7 @@ class Main extends React.Component {
             image: image
         };
 
-        emailjs.send('service_3et3hvh', 'template_jch835x', templateParams, 'user_GM5dpQBFVEjwQwf8lh6Hz')
+        emailjs.send('service_my4v2tl', 'template_z2ibchc', templateParams, 'user_v01K7ikSV9uQDaKeYIakP')
         .then((result) => {
             console.log(result.text);
         }, (error) => {
@@ -132,23 +133,25 @@ class Main extends React.Component {
     }
 
 
-    sendEmailConfirmationOrder(name, email, brand, model, color, vin, plate, qrcode) {
+    sendEmailConfirmationOrder(name, email, brand, model, color, vin, plate, qrcode, deliveryDate) {
         var message = ""
         if (this.state.receivedVIN === "FAIL") {
             message = "This car is out of stock!"
         }
         else {
-            message = "Brand: " + brand + " // Model: " + model + " // Color: " + color + " // VIN: " + vin + " // License Plate: " + plate
+            message = "Brand: " + brand + " // Model: " + model + " // Color: " + color + " // VIN: " + vin + " // License Plate: " + plate + " // Delivery Date: " + deliveryDate
         }
         var templateParams = {
             email: email,
             name: name,
             qrcode: qrcode,
-            message: message
+            message: message,
+            deliveryDate: deliveryDate
+
         };
 
         console.log("sendEmailConfirmationOrder")
-        emailjs.send('service_3et3hvh', 'template_pt6rlqi', templateParams, 'user_GM5dpQBFVEjwQwf8lh6Hz')
+        emailjs.send('service_my4v2tl', 'template_8ff23ms', templateParams, 'user_v01K7ikSV9uQDaKeYIakP')
         .then((result) => {
             console.log(result.text);
         }, (error) => {
@@ -234,6 +237,7 @@ class Main extends React.Component {
         const response = await fetch(api, data)
         const json = await response.json()
         this.setState({receivedVIN: json.message})
+        this.setState({deliveryDate: json.delivery_date})
     }
 
 
@@ -266,7 +270,7 @@ class Main extends React.Component {
             else {
                 clearInterval(this.interval)
                 this.setState({qrcode: "Unavailable"})
-                this.sendEmailConfirmationOrder(this.state.name, this.state.email, this.state.carBrand, this.state.carModel, this.state.carColor, this.state.receivedVIN, this.state.licensePlate, this.state.qrcode)
+                this.sendEmailConfirmationOrder(this.state.name, this.state.email, this.state.carBrand, this.state.carModel, this.state.carColor, this.state.receivedVIN, this.state.licensePlate, this.state.qrcode, this.state.deliveryDate)
             }
         }
     }
@@ -327,7 +331,7 @@ class Main extends React.Component {
         try {
             const qrcode = await QRCode.toDataURL("Thank you! VIN: " + this.state.receivedVIN + " and LICENSE PLATE: "+ this.state.licensePlate)
             this.setState({qrcode: qrcode})
-            this.sendEmailConfirmationOrder(this.state.name, this.state.email, this.state.carBrand, this.state.carModel, this.state.carColor, this.state.receivedVIN, this.state.licensePlate, this.state.qrcode)
+            this.sendEmailConfirmationOrder(this.state.name, this.state.email, this.state.carBrand, this.state.carModel, this.state.carColor, this.state.receivedVIN, this.state.licensePlate, this.state.qrcode, this.state.deliveryDate)
 
             clearInterval(this.interval)
         }
