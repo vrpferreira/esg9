@@ -4,6 +4,7 @@ import {ReactSession} from "react-client-session"
 import emailjs from "emailjs-com"
 import QRCode from "qrcode"
 import './style.css';
+import {Button,Container, Navbar, Card, Form} from 'react-bootstrap'; 
 
 
 class Main extends React.Component {
@@ -30,79 +31,100 @@ class Main extends React.Component {
         this.onChangeEmail = this.onChangeEmail.bind(this)
     }
 
-
-    render() {
-        return (
-            <div className="Main">
-                <div className="Main-topbar">
-                    <label className="Main-topbar-user">{ReactSession.get("username")}</label>
-                    <button className="Main-topbar-button-logout" onClick={this.clickLogout}>Logout</button>
-                    <button className="Main-topbar-button-home" onClick={this.clickHome}>Home</button>
-                </div>
-                <div className="Main-place-order-panel">
-                    <header>Place order</header>
-                    {this.renderCarAndFieldsPlaceOrder()}
-                </div>
-                <div className="Main-car-list">
-                    <div>{this.renderCarList()}</div>
-                </div>
-            </div>
-        );
-    }
-
-
-    renderCarList() {
-        return(
-            <div className="Cars">
-                {this.state.carArray.map(car => (
-                    <div className="Main-car-info" key={car.id}>
-                        <img className="Main-car-info-image" src={car.image} alt="Car"/>
-                        <div>Brand: {car.brand}</div>
-                        <div>Model: {car.model}</div>
-                        <div>Color: {car.color}</div>
-                        <div>Price: {car.price}€</div>
-                        <button onClick={() => this.clickSelect(car.id, car.brand, car.model, car.color, car.price, car.image)}>Select</button>
+            render() {
+                return (
+                    <div className="Main">
+                        <Navbar fluid bg="dark" variant="dark">
+                            <Container class="container" fluid> 
+                                <Navbar.Brand ><b>Car Dealership</b></Navbar.Brand>
+                                <Navbar.Collapse className="justify-content-end">
+                                    <Navbar.Text>
+                                    Signed in as: <b>{ReactSession.get("username")}</b>
+                                    </Navbar.Text>
+                                        <Button  className='ml-4'variant="outline-info" onClick={this.clickLogout}>Logout</Button>
+                                </Navbar.Collapse>
+                            </Container>
+                        </Navbar>
+                        <div className="Main-place-order-panel">
+                            <header><h2>Place order</h2></header>
+                            {this.renderCarAndFieldsPlaceOrder()}
+                        </div>
+                        <div className="Main-car-list">
+                            <div>{this.renderCarList()}</div>
+                        </div>
                     </div>
-                ))}
-            </div>
-        );
-    }
+                );
+            }
+
+
+            renderCarList() {
+                return(
+                    <div className="Cars">
+                        {this.state.carArray.map(car => (
+                            <div className="Main-car-info" key={car.id}>
+                                <Card className="h-100 shadow-sm bg-grey rounded">
+                                    <Card.Img variant="top" src={car.image} alt="Car" />
+                                    <Card.Body>
+                                    <Card.Text>
+                                        <div><b>Brand:</b> {car.brand}</div>
+                                        <div><b>Model:</b> {car.model}</div>
+                                        <div><b>Color:</b> {car.color}</div>
+                                        <div><b>Price:</b> {car.price}€</div>
+                                    </Card.Text>
+                                    <Button variant="dark" onClick={() => this.clickSelect(car.id, car.brand, car.model, car.color, car.price, car.image)}>Select</Button>
+                                    </Card.Body>
+                                </Card>
+                            </div>
+                        ))
+                        }
+                    </div>
+                        );
+                    }
 
 
     renderCarAndFieldsPlaceOrder() {
         if (this.state.carId !== 0) {
             return(
                 <div>
-                    <div className="Main-place-order-panel-car">
-                        <img className="Main-place-order-panel-car-image" src={this.state.carImage} alt="Car"/>
-                        <div>Brand: {this.state.carBrand}</div>
-                        <div>Model: {this.state.carModel}</div>
-                        <div>Color: {this.state.carColor}</div>
-                        <div>Price: {this.state.carPrice}</div>
-                    </div>
                     
-                    <div className="Main-place-order-form">
-                        <p>Name</p>
-                        <input type="text" name="name" value={this.state.name} onChange={this.onChangeName}></input>
-                        <p>Address</p>
-                        <input type="text" name="address" value={this.state.address} onChange={this.onChangeAddress}></input>
-                        <p>Email</p>
-                        <input type="text" name="email" value={this.state.email} onChange={this.onChangeEmail}></input>
-                        <input hidden readOnly type="text" name="carBrand" value={this.state.carBrand} />
-                        <input hidden readOnly type="text" name="carModel" value={this.state.carModel} />
-                        <input hidden readOnly type="text" name="carColor" value={this.state.carColor} />
-                        <input hidden readOnly type="text" name="carPrice" value={this.state.carPrice} />
-                        <input hidden readOnly type="text" name="carImage" value={this.state.carImage} />
-                        <button onClick={() => this.sendEmailPlaceOrder(this.state.name, this.state.address, this.state.email, this.state.carBrand, this.state.carModel, this.state.carColor, this.state.carPrice, this.state.carImage)}>Place Order</button>
+                    <div className="Main-place-order-panel-car">
+                        <Card className="h-100 shadow-sm bg-grey rounded">
+                                        <Card.Img variant="top" src={this.state.carImage} alt="Car" />
+                                        <Card.Body className="d-flex flax-column">
+                                            <Card.Text>
+                                                <div><b>Brand:</b> {this.state.carBrand}</div>
+                                                <div><b>Model:</b>: {this.state.carModel}</div>
+                                                <div><b>Color:</b> {this.state.carColor}</div>
+                                                <div><b>Price:</b> {this.state.carPrice}</div>
+                                            </Card.Text>
+                                        </Card.Body>
+                        </Card>
                     </div>
 
-                    <div className="Main-confirmation-order-form">
-                        <input hidden readOnly type="text" name="name" value={this.state.name} />
-                        <input hidden readOnly type="text" name="email" value={this.state.email} />
-                        <input hidden readOnly type="text" name="vin" value={this.state.receivedVIN} />
-                        <input hidden readOnly type="text" name="plate" value={this.state.licensePlate} />
-                        <input hidden readOnly type="text" name="qrcode" value={this.state.qrcode} />
+                
+                        
+                    <div className="Main-place-order-form">
+                        <Form>
+                            <Form.Group controlId="formBasicName">
+                                <Form.Label>Name</Form.Label>
+                                <Form.Control type="text" placeholder="Enter name" value={this.state.name} onChange={this.onChangeName}/>
+                            </Form.Group>
+
+                            <Form.Group controlId="formBasicAddress">
+                                <Form.Label>Address</Form.Label>
+                                <Form.Control type="text" placeholder="Enter Address" value={this.state.address} onChange={this.onChangeAddress}/>
+                            </Form.Group>
+
+                            <Form.Group controlId="formBasicEmail">
+                                <Form.Label>Email</Form.Label>
+                                <Form.Control type="text" placeholder="Enter Email" value={this.state.email} onChange={this.onChangeEmail}/>
+                            </Form.Group>
+                            <Button onClick={() => this.sendEmailPlaceOrder(this.state.name, this.state.address, this.state.email, this.state.carBrand, this.state.carModel, this.state.carColor, this.state.carPrice, this.state.carImage)}>
+                                Place Order
+                            </Button>
+                        </Form>
                     </div>
+
                 </div>
             )
         }

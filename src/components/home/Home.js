@@ -22,9 +22,9 @@ class Home extends React.Component {
     render() {
         return (
             <div>
-                <Navbar fluid="true" bg="dark" variant="dark">
-                    <Container fluid> 
-                        <Navbar.Brand >Car Dealership</Navbar.Brand>
+                <Navbar fluid bg="dark" variant="dark">
+                    <Container class="container" fluid> 
+                    <Navbar.Brand ><b>Car Dealership</b></Navbar.Brand>
                         <Nav className="mr-auto">
                             <Nav.Link >Home</Nav.Link>
                             <Nav.Link onClick={this.clickLogin}>Login</Nav.Link>
@@ -32,10 +32,9 @@ class Home extends React.Component {
                         </Nav>
                         <Navbar.Collapse className="justify-content-end">
                             <Navbar.Text>
-                            Signed in as: {ReactSession.get("username")}
+                            Signed in as: <b>{ReactSession.get("username")}</b>
                             </Navbar.Text>
-                
-                                <Button variant="outline-info" onClick={this.clickLogout}>Logout</Button>
+                                <Button className='ml-4' variant="outline-info" onClick={this.clickLogout}>Logout</Button>
                         </Navbar.Collapse>
                     </Container>
                 </Navbar>
