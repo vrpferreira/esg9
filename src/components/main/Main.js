@@ -308,7 +308,7 @@ class Main extends React.Component {
 
 
     /*
-    Send request to AWS (list of cars) and wait for response
+    Send request to AWS (license plate) and wait for response
     */
     requestLicensePlate = async (api, data) => {
         //Send request and waits for response
@@ -327,12 +327,45 @@ class Main extends React.Component {
         }
     }
 
+
+    /*
+    Request to save qrcode on S3
+    */
+    AwsRequestSaveQRCode() {
+        const api = 'https://zdzw8gz3xf.execute-api.us-east-1.amazonaws.com/stage/res-saveqrcode'
+        const data = {
+            method: 'POST',
+                headers: {
+                    'Accept': 'application/json',
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(
+                    {
+                        "qrcode" : this.state.qrcode
+                    }
+                )
+        }
+        this.requestSaveQRCode(api, data);
+    }
+
+
+    /*
+    Send request to AWS (save qrcode) and wait for response
+    */
+    requestSaveQRCode = async (api, data) => {
+        //Send request and waits for response
+        const response = await fetch(api, data)
+        const json = await response.json()
+        console.log("saved qrcode: " + json.message)
+    }
+
+
     generateQRCode = async () => {
         try {
             const qrcode = await QRCode.toDataURL("Thank you! VIN: " + this.state.receivedVIN + " and LICENSE PLATE: "+ this.state.licensePlate)
             this.setState({qrcode: qrcode})
             this.sendEmailConfirmationOrder(this.state.name, this.state.email, this.state.carBrand, this.state.carModel, this.state.carColor, this.state.receivedVIN, this.state.licensePlate, this.state.qrcode, this.state.deliveryDate)
-
+            this.AwsRequestSaveQRCode()
             clearInterval(this.interval)
         }
         catch (error) {
