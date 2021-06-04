@@ -1,6 +1,7 @@
 import React from "react";
 import { withRouter } from "react-router-dom";
 import './style.css';
+import {Form, Button, Container, Col} from "react-bootstrap";
 
 
 class Register extends React.Component {
@@ -20,6 +21,35 @@ class Register extends React.Component {
     render() {
         return (
             <div className="Register-parent">
+                
+                <Container>
+                 <Col md={{ span: 6, offset: 3 }}>
+                 <header className="Register-header">Register</header>
+                        <Form>
+                            <Form.Group controlId="formBasicUsername">
+                                <Form.Label>Username</Form.Label>
+                                <Form.Control type="text" placeholder="Enter username" value={this.state.username} onChange={this.onChangeUsername}/>
+                            </Form.Group>
+
+                            <Form.Group controlId="formBasicPassword">
+                                <Form.Label>Password</Form.Label>
+                                <Form.Control type="password" placeholder="Password" value={this.state.password} onChange={this.onChangePassword}/>
+                            </Form.Group>
+                            <Button variant="secondary" onClick={this.clickHome}>
+                               Back
+                            </Button>
+                            <Button variant="primary" onClick={this.clickRegister}>
+                                Register
+                            </Button>
+                        </Form>
+                    </Col>
+                </Container>
+                <div className={this.state.messageCSS}>
+                    <p>{this.state.message}</p>
+                </div>
+            </div>
+
+            /*
                 <header className="Register-header">Register</header>
                 <div className="Register-form">
                     <p>
@@ -37,6 +67,7 @@ class Register extends React.Component {
                     <p>{this.state.message}</p>
                 </div>
             </div>
+            */
         );
     }
 
