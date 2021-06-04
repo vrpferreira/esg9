@@ -6,6 +6,7 @@ import Login from './components/login/Login'
 import Main from './components/main/Main'
 import LoginFirst from './components/loginfirst/LoginFirst'
 import {ReactSession} from "react-client-session"
+import 'bootstrap/dist/css/bootstrap.min.css';
 
 
 class App extends React.Component {
@@ -22,7 +23,7 @@ class App extends React.Component {
                     <Route path="/login" component={Login} />
                     <Route path="/main" component={Main} />
                     <Route path="/loginfirst" component={LoginFirst} />
-                </div>
+                    </div>
             </Router>
         );
     }
