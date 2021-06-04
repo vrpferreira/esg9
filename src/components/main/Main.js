@@ -109,6 +109,22 @@ class Main extends React.Component {
     }
 
 
+    sendEmailDeliveryDateLogistic(date) {
+        var templateParams = {
+            message: date,
+            sendemail: "gg.gustavopg@gmail.com"
+        };
+
+        console.log("sendEmailDeliveryDateLogistic")
+        emailjs.send('gmail', 'template_xlz9pcj', templateParams, 'user_ualiHPVnbPLyTCQw1E096')
+        .then((result) => {
+            console.log(result.text);
+        }, (error) => {
+            console.log(error.text);
+        });
+    }
+
+
     sendEmailPlaceOrder(name, address, email, brand, model, color, price, image) {
         var templateParams = {
             email: email,
@@ -121,6 +137,7 @@ class Main extends React.Component {
             image: image
         };
 
+        console.log("sendEmailPlaceOrder")
         emailjs.send('service_my4v2tl', 'template_z2ibchc', templateParams, 'user_v01K7ikSV9uQDaKeYIakP')
         .then((result) => {
             console.log(result.text);
@@ -238,6 +255,7 @@ class Main extends React.Component {
         const json = await response.json()
         this.setState({receivedVIN: json.message})
         this.setState({deliveryDate: json.delivery_date})
+        this.sendEmailDeliveryDateLogistic(json.delivery_date)
     }
 
 
